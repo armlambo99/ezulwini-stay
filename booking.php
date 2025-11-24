@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $newsletter = isset($_POST['newsletter']) ? 'Yes' : 'No';
     
     // Email configuration
-    $to = "info@ezulwinistay.co.za"; // Replace with your email
+    $to = "info@proactiveict.co.za"; // Replace with your email
     $subject = "New Booking Request - Ezulwini Stay";
     
     // Email content
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Headers
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: Ezulwini Stay <noreply@ezulwinistay.co.za>" . "\r\n";
+    $headers .= "From: Ezulwini Stay <noreply@proactiveict.co.za>" . "\r\n";
     $headers .= "Reply-To: $email" . "\r\n";
     
     // Send email
@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <p>Best regards,<br>Ezulwini Stay Team</p>
             </div>
             <div class='footer'>
-                <p>Ezulwini Stay | 70 Charl Cilliers, Standerton | info@ezulwinistay.co.za</p>
+                <p>Ezulwini Stay | 70 Charl Cilliers, Standerton | info@proactiveict.co.za</p>
             </div>
         </body>
         </html>
@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $customerHeaders = "MIME-Version: 1.0" . "\r\n";
         $customerHeaders .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $customerHeaders .= "From: Ezulwini Stay <info@ezulwinistay.co.za>" . "\r\n";
+        $customerHeaders .= "From: Ezulwini Stay <info@proactiveict.co.za>" . "\r\n";
         
         mail($email, $customerSubject, $customerMessage, $customerHeaders);
         
