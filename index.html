@@ -1550,29 +1550,68 @@
         window.addEventListener('scroll', animateOnScroll);
         // Initial check on page load
         animateOnScroll();
-
-        // Booking form submission
+// Booking form submission
 document.getElementById('submitBooking').addEventListener('click', function() {
     const form = document.getElementById('bookingForm');
-    const formData = new FormData();
     
-    // Add form data
-    formData.append('firstName', document.getElementById('firstName').value);
-    formData.append('lastName', document.getElementById('lastName').value);
-    formData.append('email', document.getElementById('email').value);
-    formData.append('phone', document.getElementById('phone').value);
-    formData.append('checkIn', document.getElementById('checkIn').value);
-    formData.append('checkOut', document.getElementById('checkOut').value);
-    formData.append('roomType', document.getElementById('roomType').value);
-    formData.append('guests', document.getElementById('guests').value);
-    formData.append('specialRequests', document.getElementById('specialRequests').value);
-    formData.append('newsletter', document.getElementById('newsletter').checked);
+    // Validate required fields
+    const requiredFields = form.querySelectorAll('[required]');
+    let isValid = true;
     
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            isValid = false;
+            field.classList.add('is-invalid');
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    if (!isValid) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Validate dates
+    const checkIn = new Date(document.getElementById('checkIn').value);
+    const checkOut = new Date(document.getElementById('checkOut').value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (checkIn < today) {
+        alert('Check-in date cannot be in the past.');
+        document.getElementById('checkIn').classList.add('is-invalid');
+        return;
+    }
+    
+    if (checkOut <= checkIn) {
+        alert('Check-out date must be after check-in date.');
+        document.getElementById('checkOut').classList.add('is-invalid');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('submitBooking');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(form);
+    
+    // Add newsletter value (since checkbox might not be included in FormData if unchecked)
+    formData.append('newsletter', document.getElementById('newsletter').checked ? 'true' : 'false');
+    
+    // Send to PHP backend
     fetch('booking.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.status === 'success') {
             alert(data.message);
@@ -1587,20 +1626,55 @@ document.getElementById('submitBooking').addEventListener('click', function() {
     .catch(error => {
         console.error('Error:', error);
         alert('Sorry, there was an error sending your booking request. Please try again or contact us directly.');
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
     });
 });
 
 // Contact form submission
-document.getElementById('contactForm').addEventListener('submit', function(e) {
+document.querySelector('#contactFormForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    
+    // Validate required fields
+    const requiredFields = this.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            isValid = false;
+            field.classList.add('is-invalid');
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    if (!isValid) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    submitBtn.disabled = true;
     
     const formData = new FormData(this);
     
+    // Send to PHP backend (you'll need to create contact.php similar to booking.php)
     fetch('contact.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.status === 'success') {
             alert(data.message);
@@ -1612,6 +1686,11 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     .catch(error => {
         console.error('Error:', error);
         alert('Sorry, there was an error sending your message. Please try again or contact us directly.');
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
     });
 });
     </script>
